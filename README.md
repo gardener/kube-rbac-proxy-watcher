@@ -1,36 +1,24 @@
-# <repo name>
+# kube-rbac-proxy-watcher
 
 [![reuse compliant](https://reuse.software/badge/reuse-compliant.svg)](https://reuse.software/)
 
-## How to use this repository template
+## Usage
 
-This template repository can be used to seed new git repositories in the gardener github organisation.
+This utility serves the need of managing the lifecycle of a child process in a container environment. It is the container `entrypoint`, which later starts a dependent child process and watches for changes on a particular location on the mounted filesystem. If there are changes the main process restarts the child process by sending SIGTERM signal.
 
-- you need to be a [member of the gardener organisation](https://github.com/orgs/gardener/people)
-  in order to be able to create a new private repository
-- [create the new repository](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template)
-  based on this template repository
-- in the files
-  - `.reuse/dep5`
-  - `CODEOWNERS`
-  - `README.md`
-- replace the following placeholders
-  - `<repo name>`: name of the new repository
-  - `<maintainer team>`: name of the github team in [gardener teams](https://github.com/orgs/gardener/teams)
-    defining maintainers of the new repository.
-    If several repositories share a common topic and the same
-    set of maintainers they can share a common maintainer team
-- set the repository description in the "About" section of your repository
-- describe the new component in additional sections in this `README.md`
-- any contributions to the new repository must follow the rules in the 
-  [contributor guide](https://github.com/gardener/documentation/blob/master/CONTRIBUTING.md)
-- remove this section from this `README.md`
-- ask [@msohn](https://github.com/orgs/gardener/people/msohn) or another
-  [owner of the gardener github organisation](https://github.com/orgs/gardener/people?query=role%3Aowner)
-  - to double-check the initial content of this repository
-  - to create the maintainer team for this new repository
-  - to make this repository public
-  - protect at least the master branch requiring mandatory code review by the maintainers defined in CODEOWNERS
-  - grant admin permission to the maintainers team of the new repository defined in CODEOWNERS
+Usually this scenario is beneficial in cases where an application does not support configuration hot reloading and needs to be restarted to load changes from the configuration. Such application is [kube-rbac-proxy](https://github.com/brancz/kube-rbac-proxy), which needs to be restarted to reflect configuration changes.
 
-## UNDER CONSTRUCTION
+## Feedback and Support
+
+Feedback and contributions are always welcome. Please report bugs or suggestions as [GitHub issues](https://github.com/gardener/gardener-extension-os-gardenlinux/issues) or join our [Slack channel #gardener](https://kubernetes.slack.com/messages/gardener) (please invite yourself to the Kubernetes workspace [here](http://slack.k8s.io)).
+
+## Learn more
+
+Please find further resources about out project here:
+
+* [Our landing page gardener.cloud](https://gardener.cloud/)
+* ["Gardener, the Kubernetes Botanist" blog on kubernetes.io](https://kubernetes.io/blog/2018/05/17/gardener/)
+* ["Gardener Project Update" blog on kubernetes.io](https://kubernetes.io/blog/2019/12/02/gardener-project-update/)
+* [Gardener Extensions Golang library](https://godoc.org/github.com/gardener/gardener/extensions/pkg)
+* [GEP-1 (Gardener Enhancement Proposal) on extensibility](https://github.com/gardener/gardener/blob/master/docs/proposals/01-extensibility.md)
+* [Extensibility API documentation](https://github.com/gardener/gardener/tree/master/docs/extensions)
