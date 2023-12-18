@@ -7,6 +7,9 @@ kube-rbac-proxy-watcher:
         ocm_repository: europe-docker.pkg.dev/gardener-project/snapshots
       publish:
         oci-builder: "docker-buildx"
+        platforms:
+          - linux/amd64
+          - linux/arm64
         dockerimages:
           kube-rbac-proxy-watcher:
             image: europe-docker.pkg.dev/gardener-project/snapshots/gardener/extensions/kube-rbac-proxy-watcher
@@ -47,7 +50,7 @@ kube-rbac-proxy-watcher:
         version:
           preprocess: "finalize"
         release:
-          nextversion: "bump_minor"
+          nextversion: "bump_patch"
           next_version_callback: ".ci/prepare_release"
           release_callback: ".ci/prepare_release"
         slack:
