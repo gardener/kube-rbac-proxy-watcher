@@ -1,6 +1,6 @@
 module kube-rbac-proxy-watcher
 
-go 1.21.5
+go 1.22
 
 require (
 	github.com/go-logr/logr v1.3.0
