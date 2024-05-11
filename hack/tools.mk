@@ -29,7 +29,7 @@ GOIMPORTS                  := $(TOOLS_BIN_DIR)/goimports
 GO_ADD_LICENSE             := $(TOOLS_BIN_DIR)/addlicense
 
 # default tool versions
-GOLANGCI_LINT_VERSION ?= v1.55.2
+GOLANGCI_LINT_VERSION ?= v1.58.1
 GO_ADD_LICENSE_VERSION ?= v1.1.1
 GOIMPORTS_VERSION ?= $(call version_gomod,golang.org/x/tools)
 
