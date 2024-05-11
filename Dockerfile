@@ -1,5 +1,5 @@
 # Stage 1: Build the Go app
-FROM golang:1.22.1 AS build
+FROM golang:1.22.3 AS build
 
 # Set up the working directory
 WORKDIR /src
@@ -18,7 +18,7 @@ RUN --mount=type=cache,target="/root/.cache/go-build" \
     CGO_ENABLED=0 go build -ldflags="${LD_FLAGS}" -o watcher ./cmd/watcher/main.go
 
 # Stage 2: Produce the runtime image
-FROM quay.io/brancz/kube-rbac-proxy:v0.16.0
+FROM quay.io/brancz/kube-rbac-proxy:v0.17.1
 
 # Copy the binary from the build stage
 COPY --from=build /src/watcher /usr/bin/watcher
