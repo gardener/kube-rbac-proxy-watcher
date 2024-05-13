@@ -6,7 +6,6 @@ require (
 	github.com/go-logr/logr v1.4.1
 	github.com/stretchr/testify v1.9.0
 	k8s.io/klog/v2 v2.120.1
-	golang.org/x/tools v0.13.0
 )
 
 require (
