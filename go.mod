@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/go-logr/logr v1.4.2
 	github.com/stretchr/testify v1.9.0
-	k8s.io/klog/v2 v2.130.0
+	k8s.io/klog/v2 v2.130.1
 )
 
 require (
