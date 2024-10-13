@@ -1,4 +1,6 @@
-bin/
+build/
+tools/
+
 
 *.coverprofile
 *.html

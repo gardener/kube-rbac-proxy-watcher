@@ -21,10 +21,10 @@ import (
 	"syscall"
 
 	"github.com/go-logr/logr"
+	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
 	"kube-rbac-proxy-watcher/cmd/parameters"
-	"kube-rbac-proxy-watcher/cmd/version"
 	"kube-rbac-proxy-watcher/pkg/process"
 	"kube-rbac-proxy-watcher/pkg/watcher"
 )
@@ -35,6 +35,15 @@ var proc *process.Process
 // log
 var log logr.Logger = klog.NewKlogr()
 
+func init() {
+
+	log.Info("kube-rbac-proxy-watcher started",
+		"version", version.Get().GitVersion,
+		"revision", version.Get().GitCommit,
+		"gitTreeState", version.Get().GitTreeState,
+	)
+}
+
 // Watcher calculates hashes of files in the watchedDir and
 // sends SIGINT signal to a child process when a change is detected
 // The main purpose of this process management is to be used in a pod container,
@@ -43,8 +52,6 @@ var log logr.Logger = klog.NewKlogr()
 // hot configuration reload and needs to be restarted to reflect on configuration changes.
 
 func main() {
-
-	log.Info("Starting", "version", version.Version())
 
 	params := parameters.GetParameters(os.Args)
 	log.Info("child process parameters", "watchedDir", params.WatchedDir, "cmdLine", params.CmdLine, "cmdLineArgs", params.CmdLineArgs)
