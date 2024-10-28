@@ -6,29 +6,13 @@ Source: <https://github.com/gardener/kube-rbac-proxy-watcher
 # --------------------------------------------------
 # source code
 
-Files:
-  .github/*
-  .gitignore
-  CODEOWNERS
-  go.mod
-  go.sum
-  VERSION
+Files: *
 Copyright: 2020 SAP SE or an SAP affiliate company and Gardener contributors
 License: Apache-2.0
 
 # --------------------------------------------------
 # documentation
 
-Files:
-  CONTRIBUTING.md
-  README.md
+Files: *.md
 Copyright: 2020 SAP SE or an SAP affiliate company and Gardener contributors
 License: CC-BY-4.0
-
-# --------------------------------------------------
-# source dependencies
-
-# UNDER CONSTRUCTION
-# Files: vendor/github.com/example/dependency/*
-# Copyright: <copyright statement of dependency>
-# License: <SPDX license identifier of dependency>
