@@ -1,5 +1,5 @@
 # kube-rbac-proxy-watcher
-
+[![REUSE status](https://api.reuse.software/badge/github.com/gardener/kube-rbac-proxy-watcher)](https://api.reuse.software/info/github.com/gardener/kube-rbac-proxy-watcher)
 [![CI Build status](https://concourse.ci.gardener.cloud/api/v1/teams/gardener/pipelines/kube-rbac-proxy-watcher-main/jobs/main-head-update-job/badge)](https://concourse.ci.gardener.cloud/teams/gardener/pipelines/kube-rbac-proxy-watcher-main/jobs/main-head-update-job)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gardener/kube-rbac-proxy-watcher)](https://goreportcard.com/report/github.com/gardener/kube-rbac-proxy-watcher)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE) [![Release](https://img.shields.io/github/v/release/gardener/kube-rbac-proxy-watcher.svg?style=flat)](https://github.com/gardener/kube-rbac-proxy-watcher) [![Go Reference](https://pkg.go.dev/badge/github.com/gardener/kube-rbac-proxy-watcher.svg)](https://pkg.go.dev/github.com/gardener/kube-rbac-proxy-watcher)
