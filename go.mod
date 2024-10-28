@@ -8,7 +8,7 @@ require (
 	github.com/incu6us/goimports-reviser/v3 v3.6.5
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/tools v0.26.0
-	k8s.io/component-base v0.31.1
+	k8s.io/component-base v0.31.2
 	k8s.io/klog/v2 v2.130.1
 )
 
@@ -21,5 +21,5 @@ require (
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apimachinery v0.31.1 // indirect
+	k8s.io/apimachinery v0.31.2 // indirect
 )
