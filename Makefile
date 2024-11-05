@@ -37,13 +37,11 @@ export PATH := $(abspath $(TOOLS_DIR)):$(PATH)
 # Rules related to binary build, Docker image build and release #
 #################################################################
 
-.PHONY: docker-images
 docker-images:
 	@BUILD_ARCH=$(BUILD_ARCH) \
 		$(REPO_ROOT)/hack/docker-image-build.sh "watcher" \
 		$(IMAGE_REPOSITORY) $(IMAGE_TAG)
 
-.PHONY: docker-push
 docker-push:
 	@$(REPO_ROOT)/hack/docker-image-push.sh "watcher" \
 	$(IMAGE_REPOSITORY) $(IMAGE_TAG)
@@ -52,7 +50,10 @@ docker-push:
 # Rules for verification, formatting, linting, testing and cleaning #
 #####################################################################
 
-.PHONY: watcher
+tidy:
+	@go mod tidy
+	@go mod download
+
 watcher:
 	@echo "building $@ for $(BUILD_PLATFORM)/$(BUILD_ARCH)"
 	@go mod tidy
@@ -66,53 +67,49 @@ watcher:
 		-ldflags="$(LD_FLAGS)" \
 		$(REPO_ROOT)/cmd/watcher
 
-.PHONY: verify
-verify: check test
+verify: check test sast
 
-.PHONY: verify-extended
 verify-extended: check test-cov test-clean
 
-.PHONY: clean
 clean: test-clean
 	@rm -f $(REPO_ROOT)/build/watcher
 
-.PHONY: check
 check: format $(GO_LINT)
 	 @$(GO_LINT) run --config=$(REPO_ROOT)/.golangci.yaml --timeout 10m $(REPO_ROOT)/cmd/... $(REPO_ROOT)/pkg/...
 	 @go vet $(REPO_ROOT)/cmd/... $(REPO_ROOT)/pkg/...
 
-.PHONY: format
 format:
 	@gofmt -l -w $(REPO_ROOT)/cmd $(REPO_ROOT)/pkg
 
-.PHONY: goimports
 goimports: goimports_tool goimports-reviser_tool
 
-.PHONY: goimports_tool
 goimports_tool: $(GOIMPORTS)
 	@for dir in $(SRC_DIRS); do \
 		$(GOIMPORTS) -w $$dir/; \
 	done
 
-.PHONY: goimports-reviser_tool
 goimports-reviser_tool: $(GOIMPORTS_REVISER)
 	@for dir in $(SRC_DIRS); do \
 		GOIMPORTS_REVISER_OPTIONS="-imports-order std,project,general,company" \
 		$(GOIMPORTS_REVISER) -recursive $$dir/; \
 	done
 
-.PHONY: test
 test:
 	@go test $(REPO_ROOT)/cmd/parameters/... $(REPO_ROOT)/pkg/...
 
-.PHONY: test-cov
 test-cov:
 	@$(REPO_ROOT)/hack/test-cover.sh ./cmd/... ./pkg/...
 
-.PHONY: test-clean
 test-clean:
 	@rm -f $(REPO_ROOT)/test.*
 
-.PHONY: add-license-headers
 add-license-headers: $(GO_ADD_LICENSE)
 	@./hack/add-license-header.sh
+
+sast: tidy $(GOSEC)
+	@$(REPO_ROOT)/hack/sast.sh
+
+sast-report: tidy $(GOSEC)
+	@$(REPO_ROOT)/hack/sast.sh --gosec-report true
+
+.PHONY: docker-images docker-push watcher verify verify-extended clean check format goimports goimports_tool goimports-reviser_tool test test-cov test-clean add-license-headers sast sast-report
