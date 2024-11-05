@@ -14,6 +14,9 @@ GOIMPORTS_REVISER_VERSION                  ?= v3.6.5
 # addlicense dependency
 GO_ADD_LICENSE                             := $(TOOLS_DIR)/addlicense
 GO_ADD_LICENSE_VERSION                     ?= $(call version_gomod,github.com/google/addlicense)
+# gosec
+GOSEC     	                               := $(TOOLS_DIR)/gosec
+GOSEC_VERSION		                       ?= v2.21.4
 
 # Use this "function" to add the version file as a prerequisite for the tool target: e.g.
 tool_version_file = $(TOOLS_DIR)/.version_$(subst $(TOOLS_DIR)/,,$(1))_$(2)
@@ -25,12 +28,10 @@ $(TOOLS_DIR)/.version_%:
 	@mkdir -p $(TOOLS_DIR)
 	@touch $@
 
-.PHONY: clean-tools
 clean-tools:
 	@rm -rf $(TOOLS_DIR)/*
 
-.PHONY: create-tools
-create-tools: $(MOCKGEN) $(GINKGO) $(GOIMPORTS) $(GOIMPORTS_REVISER) $(GO_LINT)
+create-tools: $(MOCKGEN) $(GINKGO) $(GOIMPORTS) $(GOIMPORTS_REVISER) $(GO_LINT) $(GO_ADD_LICENSE) $(GOSEC)
 
 $(MOCKGEN): $(call tool_version_file,$(MOCKGEN),$(MOCKGEN_VERSION))
 	@echo "install target: $@"
@@ -54,3 +55,9 @@ $(GO_LINT): $(call tool_version_file,$(GO_LINT),$(GO_LINT_VERSION))
 
 $(GO_ADD_LICENSE):  $(call tool_version_file,$(GO_ADD_LICENSE),$(GO_ADD_LICENSE_VERSION))
 	@go build -o $(GO_ADD_LICENSE) github.com/google/addlicense
+
+$(GOSEC): $(call tool_version_file,$(GOSEC),$(GOSEC_VERSION))
+	@echo "install target: $@"
+	@GOBIN=$(abspath $(TOOLS_DIR)) go install github.com/securego/gosec/v2/cmd/gosec@$(GOSEC_VERSION)
+
+.PHONY: clean-tools create-tools
