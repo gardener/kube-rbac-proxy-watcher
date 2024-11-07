@@ -69,7 +69,7 @@ watcher:
 
 verify: check test sast
 
-verify-extended: check test-cov test-clean
+verify-extended: check test-cov sast-report
 
 clean: test-clean
 	@rm -f $(REPO_ROOT)/build/watcher
