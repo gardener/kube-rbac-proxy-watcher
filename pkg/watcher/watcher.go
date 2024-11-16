@@ -19,24 +19,27 @@ import (
 	"github.com/go-logr/logr"
 )
 
+const tickerTime = 3 * time.Second
+
 var log logr.Logger
 
-// RunTotalHashCalc creates a hash calculation loop over the content of the watched directory
+// RunTotalHashCalc calculates the combined hash of the files in a watched directory at regular intervals
 func RunTotalHashCalc(ctx context.Context, watchedDir string) <-chan string {
 	l, _ := logr.FromContext(ctx)
 	log = l.WithName("watcher")
 
 	result := make(chan string, 2)
-	ticker := time.NewTicker(3 * time.Second)
+	ticker := time.NewTicker(tickerTime)
 	result <- getTotalHash(watchedDir)
 
 	go func() {
+		defer ticker.Stop()
 		for {
 			select {
 			case <-ticker.C:
 				result <- getTotalHash(watchedDir)
 			case <-ctx.Done():
-				ticker.Stop()
+				close(result)
 				return
 			}
 		}
@@ -45,87 +48,72 @@ func RunTotalHashCalc(ctx context.Context, watchedDir string) <-chan string {
 }
 
 func getTotalHash(watchedDir string) string {
-
-	//contains folder file names as keys and corresponding hashes as values
-	filesMap := map[string]string{}
-	// synchronizing map access
-	mapMutex := sync.RWMutex{}
-	// synchronization on parallel calculation of files hashes
+	filesMap := sync.Map{} // Concurrent map for storing file hashes
 	wg := sync.WaitGroup{}
 
 	dir, err := os.ReadDir(watchedDir)
 	if err != nil {
-		log.Error(err, "error reading watched dir")
+		log.Error(err, "Failed to read watched directory")
 		return ""
 	}
 
-	for _, f := range dir {
+	// Compute hashes in parallel
+	for _, file := range dir {
 		wg.Add(1)
-		go func(filePath string) {
-			mapMutex.Lock()
-			defer mapMutex.Unlock()
-			if s := getFileSha256(filePath); s != "" {
-				filesMap[filePath] = s
+		go func(fileName string) {
+			defer wg.Done()
+			filePath := filepath.Join(watchedDir, fileName)
+			if hash := getFileSha256(filePath); hash != "" {
+				filesMap.Store(filePath, hash)
 			}
-			wg.Done()
-		}(filepath.Join(watchedDir, f.Name()))
+		}(file.Name())
 	}
 
-	//waiting for hash calculations to finish
+	// Wait for all hash computations to finish
 	wg.Wait()
 
-	mapMutex.RLock()
+	// Combine hashes in sorted order
+	var fileHashes []string
+	filesMap.Range(func(_, value interface{}) bool {
+		fileHashes = append(fileHashes, value.(string))
+		return true
+	})
+	sort.Strings(fileHashes)
 
-	keys := make([]string, len(filesMap))
-	for k := range filesMap {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	builder := strings.Builder{}
-	for _, k := range keys {
-		builder.Grow(len(filesMap[k]))
-		builder.WriteString(filesMap[k])
-	}
-	mapMutex.RUnlock()
+	combinedHash := sha256.Sum256([]byte(strings.Join(fileHashes, "")))
 
-	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(builder.String())))
-	log.V(9).Info("total hash calculated", "hash", hash)
-
-	return hash
+	return fmt.Sprintf("%x", combinedHash)
 }
 
-// Access is synchronized by the mapMutex
 func getFileSha256(filePath string) string {
 
 	stat, err := os.Stat(filePath)
 
 	if err != nil {
-		log.Error(err, "error reading file stats", "name", filePath)
+		log.Error(err, "Failed to retrieve file stats", "filePath", filePath)
 		return ""
 	}
 	if stat.IsDir() {
-		log.V(9).Info("skipping, target is folder", "name", filePath)
+		log.V(9).Info("Skipping directory", "filePath", filePath)
 		return ""
 	}
 
-	hash := sha256.New()
-	filePath = filepath.Clean(filePath)
-	f, err := os.Open(filePath)
+	file, err := os.Open(filepath.Clean(filePath))
+	if err != nil {
+		log.Error(err, "Failed to open file", "filePath", filePath)
+		return ""
+	}
 	defer func() {
-		if err = f.Close(); err != nil {
-			log.Error(err, "error closing filePath", "filePath", filePath)
+		if closeErr := file.Close(); closeErr != nil {
+			log.Error(closeErr, "Failed to close file", "filePath", filePath)
 		}
 	}()
-	if err != nil {
-		log.Error(err, "error opening filePath", "filePath", filePath)
-		return ""
-	}
-	if _, err = io.Copy(hash, f); err != nil {
-		log.Error(err, "error reading filePath", "filePath", filePath)
+
+	hash := sha256.New()
+	if _, err = io.Copy(hash, file); err != nil {
+		log.Error(err, "Failed to compute hash", "filePath", filePath)
 		return ""
 	}
 
-	s := fmt.Sprintf("%x", hash.Sum(nil))
-	log.V(9).Info("calculated hash", "filePath", filePath, "mod time", stat.ModTime(), "hash", s)
-	return s
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }
