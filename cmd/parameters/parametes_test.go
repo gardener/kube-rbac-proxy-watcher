@@ -16,13 +16,13 @@ func TestParams(t *testing.T) {
 		input    []string
 		expected Parameters
 	}{
-		{nil, Parameters{CmdLine: cmdLine, CmdLineArgs: []string{}, WatchedDir: watchedDir}},
-		{[]string{""}, Parameters{CmdLine: cmdLine, CmdLineArgs: []string{}, WatchedDir: watchedDir}},
-		{[]string{"", "60"}, Parameters{CmdLine: cmdLine, CmdLineArgs: []string{"60"}, WatchedDir: watchedDir}},
-		{[]string{"", "--watched-dir=/tmp"}, Parameters{CmdLine: cmdLine, CmdLineArgs: []string{}, WatchedDir: "/tmp"}},
-		{[]string{"", "test", "6565", "--watched-dir=/tmp"}, Parameters{CmdLine: cmdLine, CmdLineArgs: []string{"test", "6565"},
+		{nil, Parameters{CmdLine: defaultCmdLine, CmdLineArgs: []string{}, WatchedDir: defaultWatchedDir}},
+		{[]string{""}, Parameters{CmdLine: defaultCmdLine, CmdLineArgs: []string{}, WatchedDir: defaultWatchedDir}},
+		{[]string{"", "60"}, Parameters{CmdLine: defaultCmdLine, CmdLineArgs: []string{"60"}, WatchedDir: defaultWatchedDir}},
+		{[]string{"", "--watched-dir=/tmp"}, Parameters{CmdLine: defaultCmdLine, CmdLineArgs: []string{}, WatchedDir: "/tmp"}},
+		{[]string{"", "test", "6565", "--watched-dir=/tmp"}, Parameters{CmdLine: defaultCmdLine, CmdLineArgs: []string{"test", "6565"},
 			WatchedDir: "/tmp"}},
-		{[]string{"", "--watched-dir=/tmp", "test", "6565"}, Parameters{CmdLine: cmdLine, CmdLineArgs: []string{"test", "6565"},
+		{[]string{"", "--watched-dir=/tmp", "test", "6565"}, Parameters{CmdLine: defaultCmdLine, CmdLineArgs: []string{"test", "6565"},
 			WatchedDir: "/tmp"}},
 		{[]string{"", "--watched-dir=/tmp", "--cmd-line=sleep", "60"}, Parameters{CmdLine: "sleep", CmdLineArgs: []string{"60"},
 			WatchedDir: "/tmp"}},
@@ -32,7 +32,7 @@ func TestParams(t *testing.T) {
 
 	for i, test := range tests {
 		t.Logf("running test %d", i)
-		assert.EqualValues(t, test.expected, GetParameters(test.input))
+		assert.EqualValues(t, test.expected, Parse(test.input))
 	}
 
 }

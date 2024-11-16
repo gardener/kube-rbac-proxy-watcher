@@ -4,15 +4,17 @@
 
 package parameters
 
-import (
-	"strings"
+import "strings"
+
+const (
+	// watched directory for configuration changes
+	defaultWatchedDir string = "/etc/kube-rbac-proxy"
+	watchedDirParam   string = "--watched-dir="
+
+	// the target process command line that can be found under /proc/[pid]/cmdline
+	defaultCmdLine string = "/usr/local/bin/kube-rbac-proxy"
+	cmdLineParam   string = "--cmd-line="
 )
-
-// watched directory for configuration changes
-const watchedDir string = "/etc/kube-rbac-proxy"
-
-// the target process command line that can be found under /proc/[pid]/cmdline
-const cmdLine string = "/usr/local/bin/kube-rbac-proxy"
 
 // Parameters struct holds the child process argument and the watched directory
 type Parameters struct {
@@ -21,59 +23,40 @@ type Parameters struct {
 	WatchedDir  string
 }
 
-// GetParameters returns the parameters based on the supplied arguments
-func GetParameters(params []string) Parameters {
-
-	cmdLineIndex := -1
-	watchedDirIndex := -1
-	cmdLineStr := ""
-	cmdLineArgs := make([]string, 0)
-	watchedDirStr := ""
-
-	//Default values are
-	// cmdLine = "/usr/local/bin/kube-rbac-proxy"
-	// watchedDir = "/etc/kube-rbac-proxy"
-	// cmdLineArgs = ""
+// Parse returns the parameters based on the supplied arguments
+func Parse(params []string) Parameters {
 
 	parameters := Parameters{
-		CmdLine:     cmdLine,
-		CmdLineArgs: cmdLineArgs,
-		WatchedDir:  watchedDir,
+		CmdLine:     defaultCmdLine,
+		CmdLineArgs: []string{},
+		WatchedDir:  defaultWatchedDir,
 	}
+	cmdLineIndex := indexOf(params, cmdLineParam)
+	watchedDirIndex := indexOf(params, watchedDirParam)
 
-	for i, arg := range params {
-		if strings.Contains(arg, "--cmd-line=") {
-			cmdLineIndex = i
-			break
-		}
-	}
-
-	for i, arg := range params {
-		if strings.Contains(arg, "--watched-dir=") {
-			watchedDirIndex = i
-			break
-		}
-	}
-
+	// if no command line and watched directory is provided,
+	// all arguments are considered as command line arguments
 	if cmdLineIndex == -1 && watchedDirIndex == -1 && len(params) > 1 {
 		parameters.CmdLineArgs = params[1:]
 	}
 
+	// if watched directory is provided, set it
 	if watchedDirIndex > -1 {
-		watchedDirStr = params[watchedDirIndex]
+		watchedDirStr := params[watchedDirIndex]
+		watchedDirStr = strings.TrimPrefix(watchedDirStr, watchedDirParam)
 		watchedDirStr = strings.TrimSuffix(watchedDirStr, "/")
-		watchedDirStr = strings.TrimPrefix(watchedDirStr, "--watched-dir=")
 		parameters.WatchedDir = watchedDirStr
-
 	}
 
+	// if command line is not provided and watched directory is provided, set all other arguments as command line arguments
 	if cmdLineIndex == -1 && watchedDirIndex > cmdLineIndex {
 		parameters.CmdLineArgs = params[1:watchedDirIndex]
 		parameters.CmdLineArgs = append(parameters.CmdLineArgs, params[watchedDirIndex+1:]...)
 	}
 
+	// if command line is provided, set it and fetch the command line arguments according the watched directory index
 	if cmdLineIndex != -1 && cmdLineIndex < len(params) {
-		cmdLineStr = strings.TrimPrefix(params[cmdLineIndex], "--cmd-line=")
+		cmdLineStr := strings.TrimPrefix(params[cmdLineIndex], cmdLineParam)
 		parameters.CmdLine = cmdLineStr
 		if watchedDirIndex > cmdLineIndex {
 			parameters.CmdLineArgs = params[cmdLineIndex+1 : watchedDirIndex]
@@ -83,4 +66,13 @@ func GetParameters(params []string) Parameters {
 	}
 
 	return parameters
+}
+
+func indexOf(params []string, str string) int {
+	for i, arg := range params {
+		if strings.Contains(arg, str) {
+			return i
+		}
+	}
+	return -1
 }

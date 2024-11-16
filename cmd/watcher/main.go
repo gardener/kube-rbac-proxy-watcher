@@ -18,14 +18,14 @@ import (
 	"kube-rbac-proxy-watcher/pkg/watcher"
 )
 
-// Managed child process
-var proc *process.Process
-
-// log
-var log logr.Logger = klog.NewKlogr()
+var (
+	// managed child process
+	proc *process.Process
+	log  logr.Logger
+)
 
 func init() {
-
+	log = klog.NewKlogr()
 	log.Info("kube-rbac-proxy-watcher started",
 		"version", version.Get().GitVersion,
 		"revision", version.Get().GitCommit,
@@ -42,8 +42,13 @@ func init() {
 
 func main() {
 
-	params := parameters.GetParameters(os.Args)
-	log.Info("child process parameters", "watchedDir", params.WatchedDir, "cmdLine", params.CmdLine, "cmdLineArgs", params.CmdLineArgs)
+	params := parameters.Parse(os.Args)
+	log.Info(
+		"child process parameters",
+		"watchedDir", params.WatchedDir,
+		"cmdLine", params.CmdLine,
+		"cmdLineArgs", params.CmdLineArgs,
+	)
 
 	proc = process.New(log, params.CmdLine, params.CmdLineArgs...)
 
@@ -56,7 +61,10 @@ func main() {
 
 	go func() {
 		sig := <-sigs
-		log.Info("signal received", "signal", sig.String())
+		log.Info(
+			"signal received",
+			"signal", sig.String(),
+		)
 		_ = proc.Stop()
 		done <- true
 	}()
@@ -65,7 +73,6 @@ func main() {
 	currentHash := <-hash
 
 	//Shall start the processes and maintain the PID
-
 	if err := proc.Start(); err != nil {
 		log.Error(err, "error starting the child process")
 		os.Exit(1)
@@ -79,7 +86,11 @@ func main() {
 			os.Exit(0)
 		case h := <-hash:
 			if currentHash != h {
-				log.Info("total hash changed", "old hash", currentHash, "new hash", h)
+				log.Info(
+					"total hash changed",
+					"old hash", currentHash,
+					"new hash", h,
+				)
 				currentHash = h
 				if err := proc.Stop(); err != nil {
 					log.Error(err, "error stopping child process")
