@@ -11,8 +11,9 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"k8s.io/klog/v2"
 )
+
+const terminationTimeout = 10 * time.Second
 
 // Process represents the child process command environment
 type Process struct {
@@ -34,34 +35,41 @@ func New(log logr.Logger, cmdLine string, args ...string) *Process {
 	}
 }
 
-// Start starts the child process
+// Start the child process
 func (p *Process) Start() error {
 
 	if err := p.Cmd.Start(); err != nil {
 		return err
 	}
 
-	go func() {
-		if err := p.Cmd.Wait(); err != nil {
-			if exitErr, ok := err.(*exec.ExitError); ok {
-				klog.NewKlogr().Error(err, "process exited with an error", "exitCode", exitErr.ExitCode())
-			}
-		}
-	}()
-
-	p.log.Info("started", "command", p.Cmd.String(), "pid", p.Cmd.Process.Pid)
+	p.log.Info("Start", "process", p.Cmd.String(), "pid", p.Cmd.Process.Pid)
 	return nil
 }
 
-// Stop stops the child process
+// Stop the child process
 func (p *Process) Stop() error {
 
-	p.log.Info("sending SIGINT signal", "pid", p.Cmd.Process.Pid)
+	p.log.Info("Send SIGINT signal", "pid", p.Cmd.Process.Pid)
 
-	if err := p.Cmd.Process.Signal(syscall.SIGINT); err != nil {
-		p.log.Error(err, "error sending SIGINT signal, try to kill", "pid", p.Cmd.Process.Pid)
-		return p.Cmd.Process.Kill()
+	err := p.Cmd.Process.Signal(syscall.SIGINT)
+	if err != nil {
+		p.log.Error(err, "Failed to send SIGINT signal")
 	}
 
-	return nil
+	done := make(chan error)
+	go func() {
+		done <- p.Cmd.Wait()
+	}()
+
+	select {
+	case <-time.After(terminationTimeout):
+		p.log.Info("Timeout exceeded, sending SIGKILL signal")
+		return p.Cmd.Process.Kill()
+	case err := <-done:
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			p.log.Error(err, "Process exited", "pid", p.Cmd.Process.Pid, "exitCode", exitErr.ExitCode())
+			return nil
+		}
+		return err
+	}
 }
