@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/go-logr/logr v1.4.2
 	github.com/google/addlicense v1.1.1
-	github.com/incu6us/goimports-reviser/v3 v3.6.5
+	github.com/incu6us/goimports-reviser/v3 v3.8.2
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/tools v0.27.0
 	k8s.io/component-base v0.31.3
