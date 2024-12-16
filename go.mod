@@ -1,14 +1,13 @@
 module kube-rbac-proxy-watcher
 
 go 1.23
-
 require (
 	github.com/go-logr/logr v1.4.2
 	github.com/google/addlicense v1.1.1
 	github.com/incu6us/goimports-reviser/v3 v3.8.2
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/tools v0.28.0
-	k8s.io/component-base v0.31.3
+	k8s.io/component-base v0.32.0
 	k8s.io/klog/v2 v2.130.1
 )
 
@@ -21,5 +20,5 @@ require (
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apimachinery v0.31.3 // indirect
+	k8s.io/apimachinery v0.32.0 // indirect
 )
