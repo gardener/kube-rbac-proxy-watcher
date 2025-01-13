@@ -9,7 +9,7 @@ require (
 	github.com/google/addlicense v1.1.1
 	github.com/incu6us/goimports-reviser/v3 v3.8.2
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/tools v0.28.0
+	golang.org/x/tools v0.29.0
 	k8s.io/component-base v0.32.0
 	k8s.io/klog/v2 v2.130.1
 )
