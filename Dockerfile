@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Stage 1: Build the Go app
-FROM golang:1.23.4 AS build
+FROM golang:1.23.5 AS build
 
 # Set up the working directory
 WORKDIR /src
