@@ -15,23 +15,12 @@ BUILD_PLATFORM              ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 BUILD_ARCH                  ?= $(shell uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
 IMAGE_TAG                   := $(VERSION)
 
-PKG_DIR                     := $(REPO_ROOT)/pkg
-TOOLS_DIR                   := $(REPO_ROOT)/tools
-
-
 ifneq ($(strip $(shell git status --porcelain 2>/dev/null)),)
 	EFFECTIVE_VERSION := $(EFFECTIVE_VERSION)-dirty
 endif
 
 .DEFAULT_GOAL := all
 all: watcher
-#########################################
-# Tools                                 #
-#########################################
-
-include $(REPO_ROOT)/hack/tools.mk
-export PATH := $(abspath $(TOOLS_DIR)):$(PATH)
-
 
 #################################################################
 # Rules related to binary build, Docker image build and release #
@@ -54,10 +43,8 @@ tidy:
 	@go mod tidy
 	@go mod download
 
-watcher:
+watcher: tidy
 	@echo "building $@ for $(BUILD_PLATFORM)/$(BUILD_ARCH)"
-	@go mod tidy
-	@go mod download
 	@GOOS=$(BUILD_PLATFORM) \
 		GOARCH=$(BUILD_ARCH) \
 		CGO_ENABLED=0 \
@@ -74,42 +61,46 @@ verify-extended: check test-cov sast-report
 clean: test-clean
 	@rm -f $(REPO_ROOT)/build/watcher
 
-check: format $(GO_LINT)
-	 @$(GO_LINT) run --config=$(REPO_ROOT)/.golangci.yaml --timeout 10m $(REPO_ROOT)/cmd/... $(REPO_ROOT)/pkg/...
-	 @go vet $(REPO_ROOT)/cmd/... $(REPO_ROOT)/pkg/...
+check: tidy format
+	 @go tool golangci-lint run \
+	 	--config=$(REPO_ROOT)/.golangci.yaml \
+		--timeout 10m \
+		$(SRC_DIRS)
+	 @go vet \
+	 	$(SRC_DIRS)
 
 format:
-	@gofmt -l -w $(REPO_ROOT)/cmd $(REPO_ROOT)/pkg
+	@gofmt -l -w $(SRC_DIRS)
 
 goimports: goimports_tool goimports-reviser_tool
 
-goimports_tool: $(GOIMPORTS)
+goimports_tool: tidy
 	@for dir in $(SRC_DIRS); do \
-		$(GOIMPORTS) -w $$dir/; \
+		go tool goimports -w $$dir/; \
 	done
 
-goimports-reviser_tool: $(GOIMPORTS_REVISER)
+goimports-reviser_tool:
 	@for dir in $(SRC_DIRS); do \
 		GOIMPORTS_REVISER_OPTIONS="-imports-order std,project,general,company" \
-		$(GOIMPORTS_REVISER) -recursive $$dir/; \
+		go tool goimports-reviser -recursive $$dir/; \
 	done
 
 test:
-	@go test $(REPO_ROOT)/cmd/parameters/... $(REPO_ROOT)/pkg/...
+	@go tool gotest.tools/gotestsum $(SRC_DIRS)
 
 test-cov:
-	@$(REPO_ROOT)/hack/test-cover.sh ./cmd/... ./pkg/...
+	@$(REPO_ROOT)/hack/test-cover.sh $(SRC_DIRS)
 
 test-clean:
 	@rm -f $(REPO_ROOT)/test.*
 
-add-license-headers: $(GO_ADD_LICENSE)
+add-license-headers: tidy
 	@./hack/add-license-header.sh
 
-sast: tidy $(GOSEC)
+sast: tidy
 	@$(REPO_ROOT)/hack/sast.sh
 
-sast-report: tidy $(GOSEC)
+sast-report: tidy
 	@$(REPO_ROOT)/hack/sast.sh --gosec-report true
 
 .PHONY: docker-images docker-push watcher verify verify-extended clean check format goimports goimports_tool goimports-reviser_tool test test-cov test-clean add-license-headers sast sast-report

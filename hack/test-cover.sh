@@ -8,7 +8,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-echo "> Test Cover"
+root_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )"
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 COVERPROFILE="$REPO_ROOT/test.coverprofile"
@@ -17,7 +17,9 @@ COVERPROFILE_HTML="$REPO_ROOT/test.coverage.html"
 
 trap "rm -rf \"$COVERPROFILE_TMP\"" EXIT ERR INT TERM
 
-GO111MODULE=on go test -cover -coverprofile "$COVERPROFILE_TMP" -race -timeout=2m $@ | grep -v 'no test files'
+GO111MODULE=on go test \
+    -cover -coverprofile "$COVERPROFILE_TMP" \
+    -race -timeout=2m $@ | grep -v 'no test files'
 
 cat "$COVERPROFILE_TMP" | grep -vE "\.pb\.go|zz_generated" > "$COVERPROFILE"
 go tool cover -html="$COVERPROFILE" -o="$COVERPROFILE_HTML"

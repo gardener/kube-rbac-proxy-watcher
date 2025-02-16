@@ -5,15 +5,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
-dir=$(dirname $0)
+root_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )"
 
 echo "> Adding Apache License header to all go files where it is not present"
 
 temp_file=$(mktemp)
 trap "rm -f $temp_file" EXIT
-sed 's|^// *||' $dir/LICENSE_BOILERPLATE.txt > $temp_file
+sed 's|^// *||' ${root_dir}/hack/LICENSE_BOILERPLATE.txt > $temp_file
 
-$dir/../tools/addlicense \
+go tool -modfile=${root_dir}/go.mod addlicense \
   -f $temp_file \
   -y "$(date +"%Y")" \
   -l apache \
