@@ -4,15 +4,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-set -o errexit
 set -o nounset
 set -o pipefail
+set -o errexit
 
-PACKAGE_PATH="${1:-k8s.io/component-base}"
-VERSION_PATH="${2:-$(dirname $0)/../VERSION}"
-PROGRAM_NAME="${3:-kube-rbac-proxy-watcher}"
-VERSION_VERSIONFILE="$(cat "$VERSION_PATH")"
-VERSION="${EFFECTIVE_VERSION:-$VERSION_VERSIONFILE}"
+root_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )"
+VERSION="${EFFECTIVE_VERSION:-$(cat "${1:-${root_dir}/VERSION}")}"
+PROGRAM_NAME="${2:-kube-rbac-proxy-watcher}"
+
 
 MAJOR_VERSION=""
 MINOR_VERSION=""
@@ -33,10 +32,10 @@ fi
 # version-to-build in our pipelines (see https://github.com/gardener/cc-utils/issues/431).
 TREE_STATE="$([ -z "$(git status --porcelain 2>/dev/null | grep -vf <(git ls-files -o --deleted --ignored --exclude-from=.dockerignore) -e 'VERSION')" ] && echo clean || echo dirty)"
 
-echo "-X $PACKAGE_PATH/version.gitMajor=$MAJOR_VERSION
-      -X $PACKAGE_PATH/version.gitMinor=$MINOR_VERSION
-      -X $PACKAGE_PATH/version.gitVersion=$VERSION
-      -X $PACKAGE_PATH/version.gitTreeState=$TREE_STATE
-      -X $PACKAGE_PATH/version.gitCommit=$(git rev-parse --verify HEAD)
-      -X $PACKAGE_PATH/version.buildDate=$(date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/\([0-9][0-9]\)$/:\1/g')
-      -X $PACKAGE_PATH/version/verflag.programName=$PROGRAM_NAME"
+echo "-X k8s.io/component-base/version.gitMajor=$MAJOR_VERSION
+      -X k8s.io/component-base/version.gitMinor=$MINOR_VERSION
+      -X k8s.io/component-base/version.gitVersion=$VERSION
+      -X k8s.io/component-base/version.gitTreeState=$TREE_STATE
+      -X k8s.io/component-base/version.gitCommit=$(git rev-parse --verify HEAD)
+      -X k8s.io/component-base/version.buildDate=$(date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/\([0-9][0-9]\)$/:\1/g')
+      -X k8s.io/component-base/version/verflag.programName=$PROGRAM_NAME"
