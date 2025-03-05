@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Stage 1: Build the Go app
-FROM golang:1.24.0 AS build
+FROM golang:1.24.1 AS build
 
 WORKDIR /go/src
 # Copy the source code into the container
