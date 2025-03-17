@@ -1,7 +1,6 @@
 module kube-rbac-proxy-watcher
 
 go 1.24.1
-
 tool (
 	github.com/golangci/golangci-lint/cmd/golangci-lint
 	github.com/google/addlicense
@@ -15,7 +14,7 @@ tool (
 require (
 	github.com/go-logr/logr v1.4.2
 	github.com/stretchr/testify v1.10.0
-	k8s.io/component-base v0.32.2
+	k8s.io/component-base v0.32.3
 	k8s.io/klog/v2 v2.130.1
 )
 
@@ -241,7 +240,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/gotestsum v1.12.0 // indirect
 	honnef.co/go/tools v0.6.0 // indirect
-	k8s.io/apimachinery v0.32.2 // indirect
+	k8s.io/apimachinery v0.32.3 // indirect
 	mvdan.cc/gofumpt v0.7.0 // indirect
 	mvdan.cc/unparam v0.0.0-20240528143540-8a5130ca722f // indirect
 )
