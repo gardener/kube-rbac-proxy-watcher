@@ -41,32 +41,32 @@ func (p *Process) Start() error {
 		return err
 	}
 
-	p.log.Info("Start", "process", p.Cmd.String(), "pid", p.Cmd.Process.Pid)
+	p.log.Info("Start", "process", p.String(), "pid", p.Process.Pid)
 	return nil
 }
 
 // Stop the child process
 func (p *Process) Stop() error {
 
-	p.log.Info("Send SIGINT signal", "pid", p.Cmd.Process.Pid)
+	p.log.Info("Send SIGINT signal", "pid", p.Process.Pid)
 
-	err := p.Cmd.Process.Signal(syscall.SIGINT)
+	err := p.Process.Signal(syscall.SIGINT)
 	if err != nil {
 		p.log.Error(err, "Failed to send SIGINT signal")
 	}
 
 	done := make(chan error)
 	go func() {
-		done <- p.Cmd.Wait()
+		done <- p.Wait()
 	}()
 
 	select {
 	case <-time.After(terminationTimeout):
 		p.log.Info("Timeout exceeded, sending SIGKILL signal")
-		return p.Cmd.Process.Kill()
+		return p.Process.Kill()
 	case err := <-done:
 		if exitErr, ok := err.(*exec.ExitError); ok {
-			p.log.Error(err, "Process exited", "pid", p.Cmd.Process.Pid, "exitCode", exitErr.ExitCode())
+			p.log.Error(err, "Process exited", "pid", p.Process.Pid, "exitCode", exitErr.ExitCode())
 			return nil
 		}
 		return err
