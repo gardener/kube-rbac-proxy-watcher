@@ -41,7 +41,6 @@ func init() {
 // hot configuration reload and needs to be restarted to reflect on configuration changes.
 
 func main() {
-
 	params := parameters.Parse(os.Args)
 	log.Info(
 		"child process parameters",
@@ -104,5 +103,4 @@ func main() {
 			}
 		}
 	}
-
 }

@@ -89,7 +89,6 @@ func getTotalHash(watchedDir string) string {
 }
 
 func getFileSha256(filePath string) string {
-
 	stat, err := os.Stat(filePath)
 
 	if err != nil {

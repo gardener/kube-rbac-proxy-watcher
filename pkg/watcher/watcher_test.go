@@ -34,5 +34,4 @@ func TestWatcher(t *testing.T) {
 	assert.Equal(t, expected, <-RunTotalHashCalc(ctx, tmp))
 
 	defer cancel()
-
 }
