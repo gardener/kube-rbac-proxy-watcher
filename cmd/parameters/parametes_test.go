@@ -10,7 +10,6 @@ import (
 )
 
 func TestParams(t *testing.T) {
-
 	tests := []struct {
 		input    []string
 		expected Parameters
@@ -33,5 +32,4 @@ func TestParams(t *testing.T) {
 		t.Logf("running test %d", i)
 		assert.EqualValues(t, test.expected, Parse(test.input))
 	}
-
 }

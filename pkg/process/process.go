@@ -36,7 +36,6 @@ func New(log logr.Logger, cmdLine string, args ...string) *Process {
 
 // Start the child process
 func (p *Process) Start() error {
-
 	if err := p.Cmd.Start(); err != nil {
 		return err
 	}
@@ -48,7 +47,6 @@ func (p *Process) Start() error {
 
 // Stop the child process
 func (p *Process) Stop() error {
-
 	p.log.Info("Send SIGINT signal", "pid", p.Process.Pid)
 
 	err := p.Process.Signal(syscall.SIGINT)

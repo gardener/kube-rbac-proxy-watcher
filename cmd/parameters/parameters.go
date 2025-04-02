@@ -24,7 +24,6 @@ type Parameters struct {
 
 // Parse returns the parameters based on the supplied arguments
 func Parse(params []string) Parameters {
-
 	parameters := Parameters{
 		CmdLine:     defaultCmdLine,
 		CmdLineArgs: []string{},
