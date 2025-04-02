@@ -106,7 +106,7 @@ func getFileSha256(filePath string) string {
 	file, err := os.Open(filepath.Clean(filePath))
 	if err != nil {
 		log.Error(err, "Failed to open file", "filePath", filePath)
-		
+
 		return ""
 	}
 	defer func() {
