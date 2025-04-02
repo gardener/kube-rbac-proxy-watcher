@@ -13,6 +13,7 @@ BUILD_PLATFORM              ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 BUILD_ARCH                  ?= $(shell uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
 LD_FLAGS                    ?= "-s -w $(shell $(REPO_ROOT)/hack/get-ldflags.sh)"
 
+GCI_OPT                     ?= -s standard -s default -s "prefix($(shell go list -m))" --skip-generated
 
 ifneq ($(strip $(shell git status --porcelain 2>/dev/null)),)
 	EFFECTIVE_VERSION       := $(EFFECTIVE_VERSION)-dirty
@@ -20,7 +21,7 @@ endif
 IMAGE_TAG                   := $(EFFECTIVE_VERSION)
 
 .DEFAULT_GOAL := all
-all: watcher
+all: check watcher
 
 #################################################################
 # Rules related to binary build, Docker image build and release #
@@ -45,7 +46,11 @@ docker-push:
 .PHONY: tidy
 tidy:
 	@go mod tidy
-	@go mod download
+
+.PHONY: gci
+gci: tidy
+	@echo "Running gci..."
+	@go tool gci write $(GCI_OPT) $(SRC_DIRS)
 
 .PHONY: watcher
 watcher: tidy
@@ -58,25 +63,31 @@ watcher: tidy
 			-ldflags=$(LD_FLAGS) \
 			$(REPO_ROOT)/cmd/watcher
 
-.PHONY: format
-format:
-	@gofmt -l -w $(SRC_DIRS)
+.PHONY: fmt
+fmt: tidy
+	@echo "Running $@..."
+	@go tool golangci-lint fmt \
+    	--config=$(REPO_ROOT)/.golangci.yaml \
+    	$(SRC_DIRS)
 
 .PHONY: check
-check: tidy format
+check: tidy fmt gci lint
+
+.PHONY: lint
+lint: tidy
+	@echo "Running $@..."
 	 @go tool golangci-lint run \
 	 	--config=$(REPO_ROOT)/.golangci.yaml \
-		--timeout 10m \
 		$(SRC_DIRS)
-	 @go vet \
-	 	$(SRC_DIRS)
 
 .PHONY: test
 test:
+	@echo "Running $@..."
 	@go tool gotest.tools/gotestsum $(SRC_DIRS)
 
 .PHONY: test-cov
 test-cov:
+	@echo "Running $@..."
 	@$(REPO_ROOT)/hack/test-cover.sh $(SRC_DIRS)
 
 .PHONY: verify
@@ -87,32 +98,20 @@ verify-extended: check test-cov sast-report
 
 .PHONY: clean
 clean:
+	@echo "Running $@..."
 	@rm -f $(REPO_ROOT)/build/watcher
 	@rm -f $(REPO_ROOT)/*.sarif
 	@rm -f $(REPO_ROOT)/test.coverprofile
 	@rm -f $(REPO_ROOT)/test.coverage.html
 
 sast: tidy
+	@echo "Running $@..."
 	@$(REPO_ROOT)/hack/sast.sh
 
 sast-report: tidy
+	@echo "Running $@..."
 	@$(REPO_ROOT)/hack/sast.sh --gosec-report true
 
 add-license-headers: tidy
+	@echo "Running $@..."
 	@$(REPO_ROOT)/hack/add-license-header.sh
-
-.PHONY: goimports
-goimports: goimports_tool goimports-reviser_tool
-
-.PHONY: goimports_tool
-goimports_tool: tidy
-	@for dir in $(SRC_DIRS); do \
-		go tool goimports -w $$dir/; \
-	done
-
-.PHONY: goimports-reviser_tool
-goimports-reviser_tool: tidoy
-	@for dir in $(SRC_DIRS); do \
-		GOIMPORTS_REVISER_OPTIONS="-imports-order std,project,general,company" \
-		go tool goimports-reviser -recursive $$dir/; \
-	done
