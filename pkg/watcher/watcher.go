@@ -33,6 +33,7 @@ func RunTotalHashCalc(ctx context.Context, watchedDir string) <-chan string {
 
 	go func() {
 		defer ticker.Stop()
+
 		for {
 			select {
 			case <-ticker.C:
@@ -62,9 +63,12 @@ func getTotalHash(watchedDir string) string {
 	// Compute hashes in parallel
 	for _, file := range dir {
 		wg.Add(1)
+
 		go func(fileName string) {
 			defer wg.Done()
+
 			filePath := filepath.Join(watchedDir, fileName)
+
 			if hash := getFileSha256(filePath); hash != "" {
 				filesMap.Store(filePath, hash)
 			}
@@ -76,6 +80,7 @@ func getTotalHash(watchedDir string) string {
 
 	// Combine hashes in sorted order
 	var fileHashes []string
+
 	filesMap.Range(func(_, value interface{}) bool {
 		fileHashes = append(fileHashes, value.(string))
 
@@ -96,6 +101,7 @@ func getFileSha256(filePath string) string {
 
 		return ""
 	}
+
 	if stat.IsDir() {
 		log.V(9).Info("Skipping directory", "filePath", filePath)
 
@@ -108,6 +114,7 @@ func getFileSha256(filePath string) string {
 
 		return ""
 	}
+
 	defer func() {
 		if closeErr := file.Close(); closeErr != nil {
 			log.Error(closeErr, "Failed to close file", "filePath", filePath)

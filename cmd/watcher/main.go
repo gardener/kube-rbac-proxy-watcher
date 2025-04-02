@@ -50,11 +50,11 @@ func main() {
 	)
 
 	proc = process.New(log, params.CmdLine, params.CmdLineArgs...)
-
 	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	done := make(chan bool, 1)
 
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	done := make(chan bool, 1)
 	c, cancel := context.WithCancel(context.Background())
 	ctx := logr.NewContext(c, log)
 
@@ -64,7 +64,9 @@ func main() {
 			"signal received",
 			"signal", sig.String(),
 		)
+
 		_ = proc.Stop()
+
 		done <- true
 	}()
 
@@ -90,12 +92,16 @@ func main() {
 					"old hash", currentHash,
 					"new hash", h,
 				)
+
 				currentHash = h
+
 				if err := proc.Stop(); err != nil {
 					log.Error(err, "error stopping child process")
 					os.Exit(1)
 				}
+
 				proc = process.New(log, params.CmdLine, params.CmdLineArgs...)
+
 				if err := proc.Start(); err != nil {
 					log.Error(err, "error starting child process")
 					os.Exit(1)
