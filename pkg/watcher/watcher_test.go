@@ -22,6 +22,7 @@ func TestWatcher(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(tmp, "f1.tmp"), []byte("Hello World"), 0444); err != nil {
 		t.Errorf("cannot write temporary file: %v", err)
 	}
+
 	if err := os.WriteFile(filepath.Join(tmp, "f2.tmp"), []byte("World Hello"), 0444); err != nil {
 		t.Errorf("cannot write temporary file: %v", err)
 	}

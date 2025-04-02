@@ -56,6 +56,7 @@ func Parse(params []string) Parameters {
 	if cmdLineIndex != -1 && cmdLineIndex < len(params) {
 		cmdLineStr := strings.TrimPrefix(params[cmdLineIndex], cmdLineParam)
 		parameters.CmdLine = cmdLineStr
+
 		if watchedDirIndex > cmdLineIndex {
 			parameters.CmdLineArgs = params[cmdLineIndex+1 : watchedDirIndex]
 		} else {
