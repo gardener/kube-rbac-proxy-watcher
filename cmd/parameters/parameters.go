@@ -73,5 +73,6 @@ func indexOf(params []string, str string) int {
 			return i
 		}
 	}
+
 	return -1
 }
