@@ -39,10 +39,12 @@ func RunTotalHashCalc(ctx context.Context, watchedDir string) <-chan string {
 				result <- getTotalHash(watchedDir)
 			case <-ctx.Done():
 				close(result)
+
 				return
 			}
 		}
 	}()
+
 	return result
 }
 
@@ -53,6 +55,7 @@ func getTotalHash(watchedDir string) string {
 	dir, err := os.ReadDir(watchedDir)
 	if err != nil {
 		log.Error(err, "Failed to read watched directory")
+
 		return ""
 	}
 
@@ -75,6 +78,7 @@ func getTotalHash(watchedDir string) string {
 	var fileHashes []string
 	filesMap.Range(func(_, value interface{}) bool {
 		fileHashes = append(fileHashes, value.(string))
+
 		return true
 	})
 	sort.Strings(fileHashes)
@@ -90,16 +94,19 @@ func getFileSha256(filePath string) string {
 
 	if err != nil {
 		log.Error(err, "Failed to retrieve file stats", "filePath", filePath)
+
 		return ""
 	}
 	if stat.IsDir() {
 		log.V(9).Info("Skipping directory", "filePath", filePath)
+
 		return ""
 	}
 
 	file, err := os.Open(filepath.Clean(filePath))
 	if err != nil {
 		log.Error(err, "Failed to open file", "filePath", filePath)
+		
 		return ""
 	}
 	defer func() {
@@ -111,6 +118,7 @@ func getFileSha256(filePath string) string {
 	hash := sha256.New()
 	if _, err = io.Copy(hash, file); err != nil {
 		log.Error(err, "Failed to compute hash", "filePath", filePath)
+
 		return ""
 	}
 

@@ -42,6 +42,7 @@ func (p *Process) Start() error {
 	}
 
 	p.log.Info("Start", "process", p.String(), "pid", p.Process.Pid)
+
 	return nil
 }
 
@@ -63,12 +64,15 @@ func (p *Process) Stop() error {
 	select {
 	case <-time.After(terminationTimeout):
 		p.log.Info("Timeout exceeded, sending SIGKILL signal")
+
 		return p.Process.Kill()
 	case err := <-done:
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			p.log.Error(err, "Process exited", "pid", p.Process.Pid, "exitCode", exitErr.ExitCode())
+
 			return nil
 		}
+
 		return err
 	}
 }
