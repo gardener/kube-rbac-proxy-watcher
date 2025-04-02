@@ -72,7 +72,7 @@ func main() {
 	hash := watcher.RunTotalHashCalc(ctx, params.WatchedDir)
 	currentHash := <-hash
 
-	//Shall start the processes and maintain the PID
+	// Shall start the processes and maintain the PID
 	if err := proc.Start(); err != nil {
 		log.Error(err, "error starting the child process")
 		os.Exit(1)

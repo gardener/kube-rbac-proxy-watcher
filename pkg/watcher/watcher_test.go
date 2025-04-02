@@ -29,7 +29,7 @@ func TestWatcher(t *testing.T) {
 	c, cancel := context.WithCancel(context.Background())
 	ctx := logr.NewContext(c, log)
 
-	//file hash can be calculated with
+	// File hash can be calculated with
 	expected := "6e65973b642de59b523dbb45c725fa3875491c469fa63def52aa51f8477cb087"
 	assert.Equal(t, expected, <-RunTotalHashCalc(ctx, tmp))
 
