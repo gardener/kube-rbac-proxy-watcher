@@ -3,10 +3,17 @@ run:
   concurrency: 4
   go: "1.24"
 linters:
+  default: none # standard/all/none/fast
   enable:
+    - errcheck
+    - gocritic
+    - govet
+    - nlreturn
     - revive
-  disable:
+    - staticcheck
     - unused
+    - whitespace
+    - wsl
   exclusions:
     generated: lax
     rules:
@@ -27,13 +34,14 @@ linters:
       - path: (.+)\.go$
         text: '".*" imported but not used'
     paths:
-      - third_party$
-      - builtin$
-      - examples$
+      - hack/.*
 formatters:
-  exclusions:
-    generated: lax
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
+  enable:
+    - gci
+    - gofmt
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(kube-rbac-proxy-watcher)
