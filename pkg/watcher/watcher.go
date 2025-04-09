@@ -81,7 +81,7 @@ func getTotalHash(watchedDir string) string {
 	// Combine hashes in sorted order
 	var fileHashes []string
 
-	filesMap.Range(func(_, value interface{}) bool {
+	filesMap.Range(func(_, value any) bool {
 		fileHashes = append(fileHashes, value.(string))
 
 		return true
