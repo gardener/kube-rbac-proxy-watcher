@@ -42,6 +42,7 @@ func init() {
 
 func main() {
 	params := parameters.Parse(os.Args)
+
 	log.Info(
 		"child process parameters",
 		"watchedDir", params.WatchedDir,
@@ -55,36 +56,60 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	done := make(chan bool, 1)
-	c, cancel := context.WithCancel(context.Background())
-	ctx := logr.NewContext(c, log)
 
-	go func() {
-		sig := <-sigs
-		log.Info(
-			"signal received",
-			"signal", sig.String(),
-		)
+	ctx, cancel := setupContext()
+	defer cancel()
 
-		_ = proc.Stop()
-
-		done <- true
-	}()
+	go handleSignals(sigs, done)
 
 	hash := watcher.RunTotalHashCalc(ctx, params.WatchedDir)
 	currentHash := <-hash
 
 	// Shall start the processes and maintain the PID
-	if err := proc.Start(); err != nil {
+	if err := startProcess(); err != nil {
 		log.Error(err, "error starting the child process")
-		os.Exit(1)
+
+		return
 	}
 
+	monitorHashChanges(hash, currentHash, done, params)
+}
+
+func setupContext() (context.Context, context.CancelFunc) {
+	c, cancel := context.WithCancel(context.Background())
+	ctx := logr.NewContext(c, log)
+
+	return ctx, cancel
+}
+
+func handleSignals(sigs chan os.Signal, done chan bool) {
+	sig := <-sigs
+	log.Info(
+		"signal received",
+		"signal", sig.String(),
+	)
+
+	_ = proc.Stop()
+	done <- true
+}
+
+func startProcess() error {
+	if err := proc.Start(); err != nil {
+		log.Error(err, "error starting the child process")
+
+		return err
+	}
+
+	return nil
+}
+
+func monitorHashChanges(hash <-chan string, currentHash string, done chan bool, params parameters.Parameters) {
 	for {
 		select {
 		case <-done:
-			cancel()
 			log.Info("exiting")
-			os.Exit(0)
+
+			return
 		case h := <-hash:
 			if currentHash != h {
 				log.Info(
@@ -95,18 +120,24 @@ func main() {
 
 				currentHash = h
 
-				if err := proc.Stop(); err != nil {
-					log.Error(err, "error stopping child process")
-					os.Exit(1)
-				}
-
-				proc = process.New(log, params.CmdLine, params.CmdLineArgs...)
-
-				if err := proc.Start(); err != nil {
-					log.Error(err, "error starting child process")
-					os.Exit(1)
-				}
+				restartProcess(params)
 			}
 		}
+	}
+}
+
+func restartProcess(params parameters.Parameters) {
+	if err := proc.Stop(); err != nil {
+		log.Error(err, "error stopping child process")
+
+		return
+	}
+
+	proc = process.New(log, params.CmdLine, params.CmdLineArgs...)
+
+	if err := proc.Start(); err != nil {
+		log.Error(err, "error starting child process")
+
+		return
 	}
 }
