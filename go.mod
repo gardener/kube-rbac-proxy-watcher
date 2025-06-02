@@ -12,7 +12,7 @@ tool (
 )
 
 require (
-	github.com/go-logr/logr v1.4.2
+	github.com/go-logr/logr v1.4.3
 	github.com/stretchr/testify v1.10.0
 	k8s.io/component-base v0.33.1
 	k8s.io/klog/v2 v2.130.1
