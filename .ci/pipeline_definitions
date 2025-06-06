@@ -6,14 +6,14 @@ kube-rbac-proxy-watcher:
   base_definition:
     repo:
       source_labels:
-      - name: cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1
-        value:
-          policy: skip
-          comment: |
-            We use gosec for sast scanning, see attached log.
+        - name: cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1
+          value:
+            policy: skip
+            comment: |
+              We use gosec for sast scanning, see attached log.
     steps:
       verify:
-        image: 'golang:1.24.3'
+        image: "golang:1.24"
     traits:
       version:
         preprocess: "inject-commit-hash"
@@ -68,15 +68,15 @@ kube-rbac-proxy-watcher:
           next_version_callback: ".ci/prepare_release"
           release_callback: ".ci/prepare_release"
           assets:
-          - type: build-step-log
-            step_name: verify
-            purposes:
-            - lint
-            - sast
-            - gosec
-            comment: |
-              We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.
-              Enabled by https://github.com/gardener/kube-rbac-proxy-watcher/pull/15
+            - type: build-step-log
+              step_name: verify
+              purposes:
+                - lint
+                - sast
+                - gosec
+              comment: |
+                We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.
+                Enabled by https://github.com/gardener/kube-rbac-proxy-watcher/pull/15
         slack:
           default_channel: "internal_scp_workspace"
           channel_cfgs:
