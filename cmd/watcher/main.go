@@ -90,6 +90,7 @@ func handleSignals(sigs chan os.Signal, done chan bool) {
 	)
 
 	_ = proc.Stop()
+
 	done <- true
 }
 

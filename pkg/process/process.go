@@ -55,6 +55,7 @@ func (p *Process) Stop() error {
 	}
 
 	done := make(chan error)
+
 	go func() {
 		done <- p.Wait()
 	}()

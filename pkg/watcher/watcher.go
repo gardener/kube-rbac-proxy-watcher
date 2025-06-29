@@ -29,6 +29,7 @@ func RunTotalHashCalc(ctx context.Context, watchedDir string) <-chan string {
 
 	result := make(chan string, 2)
 	ticker := time.NewTicker(tickerTime)
+
 	result <- getTotalHash(watchedDir)
 
 	go func() {
@@ -95,7 +96,6 @@ func getTotalHash(watchedDir string) string {
 
 func getFileSha256(filePath string) string {
 	stat, err := os.Stat(filePath)
-
 	if err != nil {
 		log.Error(err, "Failed to retrieve file stats", "filePath", filePath)
 
