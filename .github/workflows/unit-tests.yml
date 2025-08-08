@@ -20,7 +20,23 @@ jobs:
     - name: Test
       run: |
         go mod download
-        go tool gotestsum --format github-actions
+        mkdir -p /tmp/blobs.d
+        go tool gotestsum --format github-actions |& tee /tmp/blobs.d/gotestsum.txt
+        tar czf /tmp/blobs.d/gotestsum.tar.gz -C /tmp/blobs.d gotestsum.txt
+    - name: add-unit-test-to-component-descriptor
+      uses: gardener/cc-utils/.github/actions/export-ocm-fragments@master
+      with:
+        blobs-directory: /tmp/blobs.d
+        ocm-resources: |
+          name: test-results
+          relation: local
+          access:
+            type: localBlob
+            localReference: gotestsum.tar.gz
+          labels:
+            - name: gardener.cloud/purposes
+              value:
+                - test
     - name: Report failure
       uses: nashmaniac/create-issue-action@v1.2
       # Only report failures of pushes (PRs are visible through the Checks section) to the default branch
