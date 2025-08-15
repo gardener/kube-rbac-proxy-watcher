@@ -1,4 +1,5 @@
 # kube-rbac-proxy-watcher
+
 [![REUSE status](https://api.reuse.software/badge/github.com/gardener/kube-rbac-proxy-watcher)](https://api.reuse.software/info/github.com/gardener/kube-rbac-proxy-watcher)
 [![Build](https://github.com/gardener/kube-rbac-proxy-watcher/actions/workflows/non-release.yaml/badge.svg)](https://github.com/gardener/kube-rbac-proxy-watcher/actions/workflows/non-release.yaml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gardener/kube-rbac-proxy-watcher)](https://goreportcard.com/report/github.com/gardener/kube-rbac-proxy-watcher)
