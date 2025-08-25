@@ -14,7 +14,7 @@ tool (
 require (
 	github.com/go-logr/logr v1.4.3
 	github.com/stretchr/testify v1.11.0
-	k8s.io/component-base v0.33.3
+	k8s.io/component-base v0.33.4
 	k8s.io/klog/v2 v2.130.1
 )
 
@@ -249,7 +249,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/gotestsum v1.12.3 // indirect
 	honnef.co/go/tools v0.6.1 // indirect
-	k8s.io/apimachinery v0.33.3 // indirect
+	k8s.io/apimachinery v0.33.4 // indirect
 	mvdan.cc/gofumpt v0.8.0 // indirect
 	mvdan.cc/unparam v0.0.0-20250301125049-0df0534333a4 // indirect
 )
