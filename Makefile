@@ -94,7 +94,7 @@ test-cov:
 verify: check test sast
 
 .PHONY: verify-extended
-verify-extended: check test-cov sast-report
+verify-extended: check sast-report
 
 .PHONY: clean
 clean:

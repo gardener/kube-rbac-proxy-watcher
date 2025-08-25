@@ -20,7 +20,6 @@ trap "rm -rf \"$COVERPROFILE_TMP\"" EXIT ERR INT TERM
 GO111MODULE=on go test \
     -cover -coverprofile "$COVERPROFILE_TMP" \
     -race -timeout=2m $@ | grep -v 'no test files'
-
 cat "$COVERPROFILE_TMP" | grep -vE "\.pb\.go|zz_generated" > "$COVERPROFILE"
 go tool cover -html="$COVERPROFILE" -o="$COVERPROFILE_HTML"
 
