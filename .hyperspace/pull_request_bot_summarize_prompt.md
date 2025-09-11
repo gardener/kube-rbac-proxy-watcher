@@ -1,6 +1,6 @@
 # PR Summarization Prompt
 
-Apply this prompt to summarize pull requests only when the PR description is empty.
+"auto_insert_summary" only applies when the PR description is empty.
 
 Summarize the changes in this pull request for a technical audience.
 Highlight the main features and improvements in one paragraph - required.
