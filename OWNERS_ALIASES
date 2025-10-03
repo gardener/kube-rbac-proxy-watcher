@@ -2,6 +2,12 @@
 
 aliases:
   kube-rbac-proxy-watcher-reviewers:
-  - nickytd
+    - Bobi-Wann
+    - dnaeon
+    - nickytd
+    - rrhubenov
   kube-rbac-proxy-watcher-approvers:
-  - nickytd
+    - Bobi-Wann
+    - dnaeon
+    - nickytd
+    - rrhubenov
