@@ -1,0 +1,6 @@
+# See the OWNERS docs at https://go.k8s.io/owners
+
+reviewers:
+- kube-rbac-proxy-watcher-reviewers
+approvers:
+- kube-rbac-proxy-watcher-approvers

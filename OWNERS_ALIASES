@@ -1,0 +1,7 @@
+# See the OWNERS docs at https://go.k8s.io/owners
+
+aliases:
+  kube-rbac-proxy-watcher-reviewers:
+  - nickytd
+  kube-rbac-proxy-watcher-approvers:
+  - nickytd
