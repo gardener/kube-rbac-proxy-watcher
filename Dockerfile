@@ -14,7 +14,7 @@ RUN go mod download
 RUN make watcher
 
 # Stage 2: Produce the runtime image
-FROM quay.io/brancz/kube-rbac-proxy:v0.20.0 AS watcher
+FROM quay.io/brancz/kube-rbac-proxy:v0.20.1 AS watcher
 
 # Copy the binary from the build stage
 COPY --from=build /go/src/build/watcher /usr/bin/watcher
