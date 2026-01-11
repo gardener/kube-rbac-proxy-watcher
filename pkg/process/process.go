@@ -47,6 +47,10 @@ func (p *Process) Start() error {
 
 // Stop the child process
 func (p *Process) Stop() error {
+	if p.Process == nil {
+		return nil
+	}
+
 	p.log.Info("Send SIGINT signal", "pid", p.Process.Pid)
 
 	err := p.Process.Signal(syscall.SIGINT)
@@ -64,7 +68,12 @@ func (p *Process) Stop() error {
 	case <-time.After(terminationTimeout):
 		p.log.Info("Timeout exceeded, sending SIGKILL signal")
 
-		return p.Process.Kill()
+		if killErr := p.Process.Kill(); killErr != nil {
+			return killErr
+		}
+		// Consume the wait result to prevent goroutine leak
+		<-done
+		return nil
 	case err := <-done:
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			p.log.Error(err, "Process exited", "pid", p.Process.Pid, "exitCode", exitErr.ExitCode())

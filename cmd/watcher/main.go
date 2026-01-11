@@ -7,6 +7,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/go-logr/logr"
@@ -20,8 +21,9 @@ import (
 
 var (
 	// managed child process
-	proc *process.Process
-	log  logr.Logger
+	proc     *process.Process
+	procLock sync.Mutex
+	log      logr.Logger
 )
 
 func init() {
@@ -68,6 +70,7 @@ func main() {
 	// Shall start the processes and maintain the PID
 	if err := startProcess(); err != nil {
 		log.Error(err, "error starting the child process")
+		cancel()
 
 		return
 	}
@@ -89,12 +92,19 @@ func handleSignals(sigs chan os.Signal, done chan bool) {
 		"signal", sig.String(),
 	)
 
-	_ = proc.Stop()
+	procLock.Lock()
+	if proc != nil {
+		_ = proc.Stop()
+	}
+	procLock.Unlock()
 
 	done <- true
 }
 
 func startProcess() error {
+	procLock.Lock()
+	defer procLock.Unlock()
+
 	if err := proc.Start(); err != nil {
 		log.Error(err, "error starting the child process")
 
@@ -128,6 +138,9 @@ func monitorHashChanges(hash <-chan string, currentHash string, done chan bool, 
 }
 
 func restartProcess(params parameters.Parameters) {
+	procLock.Lock()
+	defer procLock.Unlock()
+
 	if err := proc.Stop(); err != nil {
 		log.Error(err, "error stopping child process")
 
