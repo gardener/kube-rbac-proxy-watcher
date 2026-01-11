@@ -73,6 +73,7 @@ func (p *Process) Stop() error {
 		}
 		// Consume the wait result to prevent goroutine leak
 		<-done
+
 		return nil
 	case err := <-done:
 		if exitErr, ok := err.(*exec.ExitError); ok {

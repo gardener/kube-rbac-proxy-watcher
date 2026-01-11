@@ -93,9 +93,11 @@ func handleSignals(sigs chan os.Signal, done chan bool) {
 	)
 
 	procLock.Lock()
+
 	if proc != nil {
 		_ = proc.Stop()
 	}
+
 	procLock.Unlock()
 
 	done <- true
