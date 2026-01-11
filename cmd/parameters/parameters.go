@@ -47,9 +47,8 @@ func Parse(params []string) Parameters {
 	}
 
 	// if command line is not provided and watched directory is provided, set all other arguments as command line arguments
-	if cmdLineIndex == -1 && watchedDirIndex > cmdLineIndex {
-		parameters.CmdLineArgs = params[1:watchedDirIndex]
-		parameters.CmdLineArgs = append(parameters.CmdLineArgs, params[watchedDirIndex+1:]...)
+	if cmdLineIndex == -1 && watchedDirIndex != -1 {
+		parameters.CmdLineArgs = append(params[1:watchedDirIndex], params[watchedDirIndex+1:]...)
 	}
 
 	// if command line is provided, set it and fetch the command line arguments according the watched directory index

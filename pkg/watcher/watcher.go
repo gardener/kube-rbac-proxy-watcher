@@ -69,8 +69,10 @@ func getTotalHash(watchedDir string) string {
 			defer wg.Done()
 
 			filePath := filepath.Join(watchedDir, fileName)
+			hash := getFileSha256(filePath)
 
-			if hash := getFileSha256(filePath); hash != "" {
+			// Only store valid hashes; skip files with errors or directories
+			if hash != "" {
 				filesMap.Store(filePath, hash)
 			}
 		}(file.Name())
