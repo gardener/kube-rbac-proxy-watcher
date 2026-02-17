@@ -1,6 +1,6 @@
 module kube-rbac-proxy-watcher
 
-go 1.25.5
+go 1.26.0
 
 tool (
 	github.com/daixiang0/gci
