@@ -90,11 +90,21 @@ test-cov:
 	@echo "Running $@..."
 	@$(REPO_ROOT)/hack/test-cover.sh $(SRC_DIRS)
 
+.PHONY: check-go-fix
+check-go-fix: tidy
+	@echo "Running go fix..."
+	@go fix $(SRC_DIRS)/...
+	@if [ -n "$$(git status --porcelain $(SRC_DIRS))" ]; then \
+		echo "Error: go fix produced changes. Please run 'go fix ./...' and commit the changes."; \
+		git diff; \
+		exit 1; \
+	fi
+
 .PHONY: verify
-verify: check test sast
+verify: check check-go-fix test sast
 
 .PHONY: verify-extended
-verify-extended: check sast-report
+verify-extended: verify sast-report
 
 .PHONY: clean
 clean:
