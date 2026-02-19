@@ -96,7 +96,7 @@ check-go-fix: tidy
 	@go fix $(SRC_DIRS)/...
 	@if [ -n "$$(git status --porcelain $(SRC_DIRS))" ]; then \
 		echo "Error: go fix produced changes. Please run 'go fix ./...' and commit the changes."; \
-		git diff; \
+		git --no-pager diff; \
 		exit 1; \
 	fi
 
