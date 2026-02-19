@@ -22,7 +22,7 @@ type Process struct {
 
 // New creates a new process
 func New(log logr.Logger, cmdLine string, args ...string) *Process {
-	cmd := exec.Command(cmdLine, args...)
+	cmd := exec.Command(cmdLine, args...) // #nosec G204 cmdLine is controlled by the operator via CLI flags with a secure default, not by untrusted user input
 	cmd.Env = os.Environ()
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
