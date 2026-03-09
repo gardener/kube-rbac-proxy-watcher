@@ -15,7 +15,7 @@ require (
 	github.com/go-logr/logr v1.4.3
 	github.com/stretchr/testify v1.11.1
 	k8s.io/component-base v0.35.2
-	k8s.io/klog/v2 v2.130.1
+	k8s.io/klog/v2 v2.140.0
 )
 
 require (
