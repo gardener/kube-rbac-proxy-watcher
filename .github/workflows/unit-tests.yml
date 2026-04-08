@@ -27,7 +27,7 @@ jobs:
         go tool gotestsum --format github-actions |& tee /tmp/blobs.d/gotestsum.txt
         tar czf /tmp/blobs.d/gotestsum.tar.gz -C /tmp/blobs.d gotestsum.txt
     - name: add-unit-test-to-component-descriptor
-      uses: gardener/cc-utils/.github/actions/export-ocm-fragments@master
+      uses: gardener/cc-utils/.github/actions/export-ocm-fragments@v1
       with:
         blobs-directory: /tmp/blobs.d
         ocm-resources: |
