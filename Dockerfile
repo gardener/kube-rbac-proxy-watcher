@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Stage 1: Build the Go app
-FROM golang:1.26.2 AS build
+FROM golang:1.26.4 AS build
 
 WORKDIR /go/src
 # Copy the source code into the container
@@ -14,7 +14,7 @@ RUN go mod download
 RUN make watcher
 
 # Stage 2: Produce the runtime image
-FROM quay.io/brancz/kube-rbac-proxy:v0.21.2 AS watcher
+FROM quay.io/brancz/kube-rbac-proxy:v0.22.0 AS watcher
 
 # Copy the binary from the build stage
 COPY --from=build /go/src/build/watcher /usr/bin/watcher
