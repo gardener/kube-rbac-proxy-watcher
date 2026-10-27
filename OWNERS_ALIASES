@@ -6,8 +6,10 @@ aliases:
     - dnaeon
     - nickytd
     - rrhubenov
+    - iypetrov
   kube-rbac-proxy-watcher-approvers:
     - Bobi-Wan
     - dnaeon
     - nickytd
     - rrhubenov
+    - iypetrov
